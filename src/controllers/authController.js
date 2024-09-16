@@ -4,8 +4,12 @@ export const register = async (req, res) => {
   const { userName, email, password } = req.body;
 
   try {
-    const user = await registerUser(userName, email, password);
-    res.status(201).json({ result: user });
+    await registerUser(userName, email, password);
+    res.status(201).json({
+      result: {
+        message: "Пользователь успешно зарегестрирован",
+      },
+    });
   } catch (error) {
     res.status(400).json({
       result: {
@@ -19,12 +23,9 @@ export const login = async (req, res) => {
   const { userName, password } = req.body;
 
   try {
-    const token = await loginUser(userName, password);
+    const user = await loginUser(userName, password);
     res.status(200).json({
-      result: {
-        message: "Успешный вход",
-        token,
-      },
+      result: user,
     });
   } catch (error) {
     res.status(400).json({
