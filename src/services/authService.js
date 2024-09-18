@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-
 import User from "../models/user.js";
+import { generateAccesToken, generateRefreshToken } from "../utils/tokens.js";
 
 export const registerUser = async (userName, email, password) => {
   if (await User.findOne({ userName })) {
@@ -20,8 +19,6 @@ export const registerUser = async (userName, email, password) => {
   return user;
 };
 
-const jwtSecret = process.env.JWT_SECRET;
-
 export const loginUser = async (userName, password) => {
   const user = await User.findOne({ userName });
 
@@ -34,7 +31,8 @@ export const loginUser = async (userName, password) => {
     throw new Error("Неверный пароль");
   }
 
-  const token = jwt.sign({ id: user._id, userName: user.userName }, jwtSecret, { expiresIn: "2h" });
+  const accessToken = generateAccesToken(user);
+  const refreshToken = generateRefreshToken(user);
 
-  return { id: user._id, name: user.userName, token };
+  return { id: user._id, name: user.userName, accessToken, refreshToken };
 };
